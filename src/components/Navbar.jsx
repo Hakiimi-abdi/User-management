@@ -1,4 +1,3 @@
-import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import ThemeToggle from './ThemeToggle';
@@ -8,7 +7,6 @@ const Navbar = () => {
 
   const Links = [
     { text: 'Home', path: '/' },
-    { text: 'PlayGround', path: '/playground' },
     { text: 'Add User', path: '/add-user' },
   ];
 
