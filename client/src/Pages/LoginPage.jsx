@@ -11,7 +11,7 @@ const LoginPage = () => {
     e.preventDefault();
 
     try {
-      const response = await fetch('/api/login', {
+      const response = await fetch('/api/users/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -21,8 +21,15 @@ const LoginPage = () => {
       const data = await response.json();
 
       if (response.ok) {
-        localStorage.setItem('token', data.accessToken);
-        localStorage.setItem('user', JSON.stringify(data.user));
+        localStorage.setItem('token', data.token);
+        localStorage.setItem(
+          'user',
+          JSON.stringify({
+            _id: data._id,
+            name: data.name,
+            email: data.email,
+          })
+        );
 
         toast.success('Logged in successfully!');
         navigate('/');

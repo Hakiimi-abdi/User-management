@@ -9,7 +9,6 @@ import LoginPage from './Pages/LoginPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import MainLayout from './Layout/MainLayout';
 import HomePage from './Pages/HomePage';
-import Playground from './Pages/Playground';
 import AddUser from './Pages/AddUser';
 import EditUserPage from './Pages/EditUserPage';
 import { Toaster } from 'sonner';
@@ -17,37 +16,60 @@ import { ThemeProvider } from './context/ThemeContext';
 import ThemeToggle from './components/ThemeToggle';
 
 const addUser = async (newUser) => {
+  const token = localStorage.getItem('token');
+
   const res = await fetch('/api/users', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify(newUser),
   });
-  return res;
+
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new Error(errorData.message || 'Failed to add user!');
+  }
+
+  return await res.json();
 };
 
-const updateUser = async (id, updatedUser) => {
-  const res = await fetch(`/api/users/${id}`, {
+const updateUser = async (userId, updatedUser) => {
+  const token = localStorage.getItem('token');
+
+  const res = await fetch(`/api/users/${userId}`, {
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify(updatedUser),
   });
+
   if (!res.ok) {
-    throw new error('Failed to update user!');
+    const errorData = await res.json();
+    throw new Error(errorData.message || 'Failed to update user');
   }
-  return res;
+
+  return await res.json();
 };
 
 const deleteUser = async (id) => {
+  const token = localStorage.getItem('token');
+
   const res = await fetch(`/api/users/${id}`, {
     method: 'DELETE',
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
   });
+
   if (!res.ok) {
-    throw new Error('Failed to Delete the user!');
+    const errorData = await res.json().catch(() => ({}));
+    throw new Error(errorData.message || 'Failed to Delete the user!');
   }
+
   return res;
 };
 const router = createBrowserRouter(
@@ -64,7 +86,6 @@ const router = createBrowserRouter(
         }
       >
         <Route index element={<HomePage deleteUser={deleteUser} />} />
-        <Route path="playground" element={<Playground />} />
         <Route path="add-user" element={<AddUser submitNewUser={addUser} />} />
         <Route
           path="edit-user/:id"

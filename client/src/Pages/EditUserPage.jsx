@@ -10,9 +10,9 @@ const EditUserPage = ({ submitUpdatedUser }) => {
   const [name, setName] = useState(user?.name || '');
   const [username, setUserName] = useState(user?.username || '');
   const [email, setEmail] = useState(user?.email || '');
-  const [password, setPassword] = useState(user?.password || '');
+  const [password, setPassword] = useState('');
   const [phone, setPhone] = useState(user?.phone || '');
-  const [website, setWebsite] = useState(user?.Website || '');
+  const [website, setWebsite] = useState(user?.website || user?.Website || '');
   const [city, setCity] = useState(user?.address?.city || '');
   const [company, setCompany] = useState(user?.company?.name || '');
 
@@ -20,27 +20,34 @@ const EditUserPage = ({ submitUpdatedUser }) => {
     e.preventDefault();
 
     const updatedUser = {
-      ...user,
       name,
       username,
       email,
-      password,
       phone,
       website,
       address: { city },
       company: { name: company },
     };
-    await submitUpdatedUser(user.id, updatedUser);
-    toast.success('User updated successfully!');
-    navigate('/');
+    if (password.trim() !== '') {
+      updatedUser.password = password;
+    }
+
+    try {
+      await submitUpdatedUser(user._id, updatedUser);
+      toast.success('User updated successfully!');
+      navigate('/');
+    } catch (error) {
+      toast.error('Failed to update user!');
+    }
   };
+
   return (
     <section className="bg-indigo-50 dark:bg-gray-950 transition-colors duration-200">
       <div className="container m-auto max-w-3xl py-24">
         <div className="bg-white dark:bg-gray-800 px-6 py-8 mb-4 shadow-md rounded-md border border-gray-200 dark:border-gray-700 m-4 md:m-0">
           <form onSubmit={submitForm}>
             <h2 className="text-3xl text-center font-semibold mb-6 text-gray-900 dark:text-white">
-              Edit user
+              Edit User
             </h2>
 
             <div className="mb-4">
@@ -52,7 +59,6 @@ const EditUserPage = ({ submitUpdatedUser }) => {
               </label>
               <input
                 type="text"
-                name="name"
                 id="name"
                 required
                 value={name}
@@ -63,14 +69,13 @@ const EditUserPage = ({ submitUpdatedUser }) => {
 
             <div className="mb-4">
               <label
-                htmlFor="type"
+                htmlFor="userName"
                 className="block text-gray-700 dark:text-gray-300 font-bold mb-2"
               >
-                UserName
+                Username
               </label>
               <input
                 type="text"
-                name="userName"
                 id="userName"
                 className="border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded w-full py-2 px-3 mb-2 focus:outline-none focus:border-indigo-500"
                 required
@@ -88,8 +93,8 @@ const EditUserPage = ({ submitUpdatedUser }) => {
               </label>
               <input
                 type="email"
-                name="email"
                 id="email"
+                required
                 className="border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded w-full py-2 px-3 focus:outline-none focus:border-indigo-500"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -101,12 +106,12 @@ const EditUserPage = ({ submitUpdatedUser }) => {
                 htmlFor="password"
                 className="block text-gray-700 dark:text-gray-300 font-bold mb-2"
               >
-                Passwrod
+                New Password (leave blank to keep current)
               </label>
               <input
                 type="password"
-                name="password"
                 id="password"
+                placeholder="••••••••"
                 className="border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded w-full py-2 px-3 focus:outline-none focus:border-indigo-500"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -121,7 +126,7 @@ const EditUserPage = ({ submitUpdatedUser }) => {
                 City
               </label>
               <input
-                name="text"
+                type="text"
                 id="city"
                 className="border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded w-full py-2 px-3 focus:outline-none focus:border-indigo-500"
                 required
@@ -139,7 +144,6 @@ const EditUserPage = ({ submitUpdatedUser }) => {
               </label>
               <input
                 type="tel"
-                name="phone"
                 id="phone"
                 className="border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded w-full py-2 px-3 mb-2 focus:outline-none focus:border-indigo-500"
                 required
@@ -157,7 +161,6 @@ const EditUserPage = ({ submitUpdatedUser }) => {
               </label>
               <input
                 type="text"
-                name="website"
                 id="website"
                 value={website}
                 className="border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded w-full py-2 px-3 focus:outline-none focus:border-indigo-500"
@@ -170,11 +173,10 @@ const EditUserPage = ({ submitUpdatedUser }) => {
                 htmlFor="companyName"
                 className="block text-gray-700 dark:text-gray-300 font-bold mb-2"
               >
-                Company name
+                Company Name
               </label>
               <input
                 type="text"
-                name="companyName"
                 id="companyName"
                 value={company}
                 className="border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded w-full py-2 px-3 focus:outline-none focus:border-indigo-500"
